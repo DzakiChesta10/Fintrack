@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { roundMoney, addMoney, subtractMoney } from '@/lib/money';
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
