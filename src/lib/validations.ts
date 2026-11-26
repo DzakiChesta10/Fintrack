@@ -108,3 +108,31 @@ export const userSettingsSchema = z.object({
   currency: z.enum(['IDR', 'USD', 'SGD']),
   pinCode: z.string().regex(/^\d{4,6}$/, 'PIN harus berupa 4-6 digit angka').optional().nullable(),
 });
+
+// ─── Utang & Piutang ──────────────────────────────────────────────────────────
+export const debtSchema = z.object({
+  type: z.enum(['DEBT', 'RECEIVABLE']),
+  personName: z.string().min(2, 'Nama minimal 2 karakter').max(100),
+  amount: z.number().positive('Nominal harus lebih dari 0'),
+  dueDate: z.union([z.string(), z.date()]).optional().nullable(),
+  borrowDate: z.union([z.string(), z.date()]).optional(),
+  description: z.string().max(255).optional().nullable(),
+  walletId: z.string().optional().nullable(),
+  notes: z.string().max(500).optional().nullable(),
+});
+
+export const debtPaymentSchema = z.object({
+  debtId: z.string().min(1),
+  amount: z.number().positive('Nominal cicilan harus lebih dari 0'),
+  date: z.union([z.string(), z.date()]).optional(),
+  notes: z.string().max(255).optional().nullable(),
+});
+
+// ─── Notifikasi ───────────────────────────────────────────────────────────────
+export const notificationSchema = z.object({
+  type: z.enum(['BUDGET_ALERT', 'DEBT_DUE', 'REMINDER', 'SYSTEM', 'CUSTOM']).default('CUSTOM'),
+  title: z.string().min(2, 'Judul notifikasi minimal 2 karakter').max(120),
+  body: z.string().min(2, 'Isi notifikasi minimal 2 karakter').max(500),
+  link: z.string().url('Link harus berupa URL valid').optional().nullable(),
+  metadata: z.string().optional().nullable(),
+});

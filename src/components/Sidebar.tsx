@@ -20,6 +20,7 @@ import {
   Coins,
   ChevronRight,
   TrendingUp,
+  HandCoins,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -39,6 +40,7 @@ export function Sidebar({ onOpenQuickAdd, isOpenMobile, onCloseMobile }: Sidebar
     { name: 'Anggaran Bulanan', href: '/budgets', icon: PieChart },
     { name: 'Transaksi Rutin', href: '/recurring', icon: Repeat },
     { name: 'Target Tabungan', href: '/goals', icon: Target },
+    { name: 'Utang & Piutang', href: '/debts', icon: HandCoins, badge: 'Baru' },
     { name: 'Split Bill (Patungan)', href: '/split-bill', icon: Users, badge: 'Inovasi' },
     { name: 'Laporan & Tren', href: '/analytics', icon: BarChart3 },
     { name: 'Impor & Ekspor', href: '/import-export', icon: FileSpreadsheet },

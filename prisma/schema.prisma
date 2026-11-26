@@ -29,6 +29,8 @@ model User {
   recurringTransactions RecurringTransaction[]
   savingsGoals          SavingsGoal[]
   splitBills            SplitBill[]
+  debts                 Debt[]
+  notifications         Notification[]
 }
 
 model Wallet {
@@ -48,6 +50,7 @@ model Wallet {
   recurringTransactions RecurringTransaction[] @relation("RecurringSourceWallet")
   recurringTransfers    RecurringTransaction[] @relation("RecurringDestinationWallet")
   savingsGoals          SavingsGoal[]
+  debts                 Debt[]
 }
 
 model Category {
@@ -164,6 +167,57 @@ model SplitBill {
   details           String? // JSON representation of participant items
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Utang & Piutang ──────────────────────────────────────────────────────────
+model Debt {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String    // DEBT (saya berhutang) | RECEIVABLE (orang lain berhutang ke saya)
+  personName  String    // Nama kreditur / debitur
+  amount      Float
+  paidAmount  Float     @default(0)
+  dueDate     DateTime?
+  borrowDate  DateTime  @default(now())
+  description String?
+  status      String    @default("UNPAID") // UNPAID | PARTIAL | PAID
+  walletId    String?   // Dompet yang terdampak saat pelunasan
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet   Wallet? @relation(fields: [walletId], references: [id], onDelete: SetNull)
+  payments DebtPayment[]
+}
+
+// Riwayat cicilan / pelunasan untuk setiap utang/piutang
+model DebtPayment {
+  id        String   @id @default(cuid())
+  debtId    String
+  amount    Float
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+
+  debt Debt @relation(fields: [debtId], references: [id], onDelete: Cascade)
+}
+
+// ─── Notifikasi (CRUD penuh) ──────────────────────────────────────────────────
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String    // BUDGET_ALERT | DEBT_DUE | REMINDER | SYSTEM | CUSTOM
+  title     String
+  body      String
+  isRead    Boolean   @default(false)
+  link      String?   // Optional deep-link ke halaman tertentu
+  metadata  String?   // JSON blob (e.g. budgetId, debtId)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
